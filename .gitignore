@@ -28,3 +28,6 @@ notes.txt
 
 .coveralls.yml
 .nyc_output
+.idea/
+yarn.lock
+bundle.js*

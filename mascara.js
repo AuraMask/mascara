@@ -1,58 +1,43 @@
-const setupProvider = require('./lib/setup-provider.js')
-const setupDappAutoReload = require('./lib/auto-reload.js')
-const setupWidget = require('./lib/setup-widget.js')
-const config = require('./config.json')
+const setupProvider = require('./lib/setup-provider.js');
+const setupDappAutoReload = require('./lib/auto-reload.js');
+const setupWidget = require('./lib/setup-widget.js');
+const config = require('./config.json');
 
 module.exports = {
-  createDefaultProvider,
-  // disabled for now
-  setupWidget,
-}
+    createDefaultProvider,
+    // disabled for now
+    setupWidget,
+};
 
-function createDefaultProvider (opts = {}) {
-  const host = opts.host || 'https://wallet.metamask.io'
-  //
-  // setup provider
-  //
+function createDefaultProvider(opts = {}) {
+    const host = opts.host || 'https://wallet.metamask.io';
 
-  const provider = setupProvider({
-    mascaraUrl: host + '/proxy/',
-  })
-  instrumentForUserInteractionTriggers(provider)
+    // setup provider
+    const provider = setupProvider({mascaraUrl: host + '/proxy/'});
+    instrumentForUserInteractionTriggers(provider);
 
-  //
-  // ui stuff
-  //
+    // ui stuff
+    let shouldPop = false;
+    window.addEventListener('click', maybeTriggerPopup);
 
-  let shouldPop = false
-  window.addEventListener('click', maybeTriggerPopup)
+    return !window.webu ? setupDappAutoReload(provider, provider.publicConfigStore) : provider;
 
-  return !window.web3 ? setupDappAutoReload(provider, provider.publicConfigStore) : provider
-
-
-  //
-  // util
-  //
-
-  function maybeTriggerPopup(event){
-    if (!shouldPop) return
-    shouldPop = false
-    window.open(host, '', 'width=360 height=500')
-  }
-
-  function instrumentForUserInteractionTriggers(provider){
-    if (window.web3) return provider
-    const _super = provider.sendAsync.bind(provider)
-    provider.sendAsync = function (payload, cb) {
-      if (config.ethereum['should-show-ui'].includes(payload.method)) {
-        shouldPop = true
-      }
-      _super(payload, cb)
+    // util
+    function maybeTriggerPopup(event) {
+        if (!shouldPop) return;
+        shouldPop = false;
+        window.open(host, '', 'width=360 height=500');
     }
-  }
+
+    function instrumentForUserInteractionTriggers(provider) {
+        if (window.webu) return provider;
+        const _super = provider.sendAsync.bind(provider);
+        provider.sendAsync = function(payload, cb) {
+            if (config.irchain['should-show-ui'].includes(payload.method)) {
+                shouldPop = true;
+            }
+            _super(payload, cb);
+        };
+    }
 
 }
-
-// function setupWidget (opts = {}) {
-
-// }

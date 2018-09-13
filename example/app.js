@@ -1,40 +1,39 @@
-const metamask = require('../mascara')
-const EthQuery = require('ethjs-query')
-window.addEventListener('load', loadProvider)
-window.addEventListener('message', console.warn)
-metamask.setupWidget({host: 'http://localhost:9001'})
+const auramask = require('../mascara');
+const Irc = require('irc.js');
+window.addEventListener('load', loadProvider);
+window.addEventListener('message', console.warn);
+auramask.setupWidget({host: 'http://localhost:9001'});
 
 async function loadProvider() {
-  const ethereumProvider = metamask.createDefaultProvider({host: 'http://localhost:9001'})
-  global.ethQuery = new EthQuery(ethereumProvider)
-  const accounts = await ethQuery.accounts()
-   window.METAMASK_ACCOUNT = accounts[0] || 'locked'
-  logToDom(accounts.length ? accounts[0] : 'LOCKED or undefined', 'account')
-  setupButtons(ethQuery)
+  const irchainProvider = auramask.createDefaultProvider({host: 'http://localhost:9001'});
+  global.irc = new Irc(irchainProvider, {});
+  const accounts = await irc.accounts();
+  window.AURAMASK_ACCOUNT = accounts[0] || 'locked';
+  logToDom(accounts.length ? accounts[0] : 'LOCKED or undefined', 'account');
+  setupButtons(irc);
 }
 
-
-function logToDom(message, context){
-  document.getElementById(context).innerText = message
-  console.log(message)
+function logToDom(message, context) {
+  document.getElementById(context).innerText = message;
+  console.log(message);
 }
 
-function setupButtons (ethQuery) {
-  const accountButton = document.getElementById('action-button-1')
+function setupButtons(irc) {
+  const accountButton = document.getElementById('action-button-1');
   accountButton.addEventListener('click', async () => {
-    const accounts = await ethQuery.accounts()
-    window.METAMASK_ACCOUNT = accounts[0] || 'locked'
-    logToDom(accounts.length ? accounts[0] : 'LOCKED or undefined', 'account')
-  })
-  const txButton = document.getElementById('action-button-2')
+    const accounts = await irc.accounts();
+    window.AURAMASK_ACCOUNT = accounts[0] || 'locked';
+    logToDom(accounts.length ? accounts[0] : 'LOCKED or undefined', 'account');
+  });
+  const txButton = document.getElementById('action-button-2');
   txButton.addEventListener('click', async () => {
-    if (!window.METAMASK_ACCOUNT || window.METAMASK_ACCOUNT === 'locked') return
-    const txHash = await ethQuery.sendTransaction({
-      from: window.METAMASK_ACCOUNT,
-      to: window.METAMASK_ACCOUNT,
+    if (!window.AURAMASK_ACCOUNT || window.AURAMASK_ACCOUNT === 'locked') return;
+    const txHash = await irc.sendTransaction({
+      from: window.AURAMASK_ACCOUNT,
+      to: window.AURAMASK_ACCOUNT,
       data: '',
-    })
-    logToDom(txHash, 'cb-value')
-  })
+    });
+    logToDom(txHash, 'cb-value');
+  });
 
 }

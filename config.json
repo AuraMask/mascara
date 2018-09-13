@@ -1,12 +1,12 @@
 {
-  "ethereum": {
+  "irchain": {
     "deprecated-methods": {
-      "eth_sign": "eth_sign has been deprecated in metamascara due to security concerns please use eth_signTypedData"
+      "irc_sign": "irc_sign has been deprecated in auramascara due to security concerns please use irc_signTypedData"
     },
     "should-show-ui": [
-      "eth_personalSign",
-      "eth_signTypedData",
-      "eth_sendTransaction"
+      "irc_personalSign",
+      "irc_signTypedData",
+      "irc_sendTransaction"
     ]
   }
 }
